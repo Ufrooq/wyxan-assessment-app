@@ -9,6 +9,40 @@ import type {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
 
+function getPublishErrorMessage(message: unknown) {
+  const messages = Array.isArray(message)
+    ? message.filter((item): item is string => typeof item === "string")
+    : typeof message === "string"
+      ? [message]
+      : [];
+
+  if (messages.some((item) => item.includes("address must match"))) {
+    return "Use a lowercase .zz address with letters, numbers, or hyphens, like my-notes.zz.";
+  }
+
+  if (messages.some((item) => item.includes("authorId must be"))) {
+    return "Select a valid person before publishing.";
+  }
+
+  if (messages.some((item) => item.includes("title should not be empty"))) {
+    return "Add a title before publishing.";
+  }
+
+  if (messages.some((item) => item.includes("title must be shorter"))) {
+    return "Keep the title under 100 characters.";
+  }
+
+  if (messages.some((item) => item.includes("bodyHtml should not be empty"))) {
+    return "Add some HTML body content before publishing.";
+  }
+
+  if (messages.some((item) => item.includes("already published"))) {
+    return "That address is already published. Choose a different .zz address.";
+  }
+
+  return messages[0] ?? "Could not publish this site.";
+}
+
 export async function fetchSiteByAddress(
   address: string,
 ): Promise<PageResult> {
@@ -136,12 +170,9 @@ export async function publishSite(payload: CreateSitePayload): Promise<{
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => null);
-      const message = Array.isArray(errorBody?.message)
-        ? errorBody.message[0]
-        : errorBody?.message;
 
       return {
-        error: message ?? "Could not publish this site.",
+        error: getPublishErrorMessage(errorBody?.message),
       };
     }
 

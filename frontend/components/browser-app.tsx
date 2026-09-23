@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { BrowserToolbar } from "@/components/browser-toolbar";
 import { HistoryPanel } from "@/components/history-panel";
 import { PageViewer } from "@/components/page-viewer";
@@ -51,7 +52,6 @@ export function BrowserApp({
   const [publishAddress, setPublishAddress] = useState("");
   const [publishTitle, setPublishTitle] = useState("");
   const [publishBodyHtml, setPublishBodyHtml] = useState("");
-  const [publishError, setPublishError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -155,12 +155,11 @@ export function BrowserApp({
     event.preventDefault();
 
     if (!selectedPersonId) {
-      setPublishError("Select a person before publishing.");
+      toast.error("Select a person before publishing.");
       return;
     }
 
     setIsPublishing(true);
-    setPublishError(null);
 
     const result = await publishSite({
       address: publishAddress.trim().toLowerCase(),
@@ -170,7 +169,7 @@ export function BrowserApp({
     });
 
     if (result.error || !result.site) {
-      setPublishError(result.error ?? "Could not publish this site.");
+      toast.error(result.error ?? "Could not publish this site.");
       setIsPublishing(false);
       return;
     }
@@ -179,15 +178,16 @@ export function BrowserApp({
     setPublishTitle("");
     setPublishBodyHtml("");
     setIsPublishing(false);
+    toast.success(`${result.site.address} was published.`);
     await navigateToAddress(result.site.address, "typed", currentAddress);
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f7f7] text-[#17212b]">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1560px] flex-col px-6 py-4">
+    <main className="h-screen overflow-hidden bg-[#f5f7f7] text-[#17212b]">
+      <div className="mx-auto flex h-screen w-full max-w-[1560px] flex-col px-6 py-4">
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#d6dedb] pb-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#667580]">
+            <p className="text-xs uppercase tracking-[0.16em] text-[#667580]">
               The Small Web
             </p>
             <h1 className="text-2xl font-semibold tracking-tight">Browser</h1>
@@ -200,7 +200,7 @@ export function BrowserApp({
           />
         </header>
 
-        <section className="mt-4 overflow-hidden rounded-lg border border-[#cbd5d1] bg-white shadow-sm">
+        <section className="mt-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-[#cbd5d1] bg-white shadow-sm">
           <BrowserToolbar
             addressInput={addressInput}
             canGoBack={canGoBack}
@@ -212,7 +212,7 @@ export function BrowserApp({
             onForward={goForward}
           />
 
-          <div className="grid min-h-[calc(100vh-190px)] grid-cols-1 lg:grid-cols-[290px_1fr_420px]">
+          <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[290px_1fr_420px]">
             <HistoryPanel
               visits={visits}
               onOpenVisit={(address) =>
@@ -229,7 +229,7 @@ export function BrowserApp({
               }
             />
 
-            <aside className="border-t border-[#e2e8e5] bg-[#fbfcfc] p-4 lg:border-l lg:border-t-0">
+            <aside className="flex min-h-0 flex-col overflow-hidden border-t border-[#e2e8e5] bg-[#fbfcfc] p-4 lg:border-l lg:border-t-0">
               <SearchPanel
                 query={searchQuery}
                 results={searchResults}
@@ -246,7 +246,6 @@ export function BrowserApp({
                 address={publishAddress}
                 title={publishTitle}
                 bodyHtml={publishBodyHtml}
-                error={publishError}
                 isPublishing={isPublishing}
                 onAddressChange={setPublishAddress}
                 onTitleChange={setPublishTitle}
