@@ -72,6 +72,13 @@ export function BrowserApp({
     loadVisits();
   }, [selectedPersonId]);
 
+  function handlePersonChange(personId: string) {
+    setSelectedPersonId(personId);
+    setSearchQuery("");
+    setSearchResults([]);
+    setHasSearched(false);
+  }
+
   async function navigateToAddress(
     address: string,
     arrivedFrom: VisitSource,
@@ -196,7 +203,7 @@ export function BrowserApp({
           <PersonSelector
             people={people}
             selectedPersonId={selectedPersonId}
-            onPersonChange={setSelectedPersonId}
+            onPersonChange={handlePersonChange}
           />
         </header>
 
