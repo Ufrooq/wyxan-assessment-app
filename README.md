@@ -17,13 +17,19 @@ A small full-stack web app for the Wyxan technical assessment. The project imple
 
 ## Setup
 
-Clone the repo, then install dependencies in both apps:
+Clone the repo, then install dependencies in both apps from the repo root.
+
+Backend:
 
 ```bash
 cd backend
 npm install
+```
 
-cd ../frontend
+Frontend:
+
+```bash
+cd frontend
 npm install
 ```
 
@@ -144,4 +150,3 @@ docker compose config --quiet
 - Search across site address, title, and page text
 - Publish new pages with sanitized HTML
 - Friendly publish success and error notifications
-
