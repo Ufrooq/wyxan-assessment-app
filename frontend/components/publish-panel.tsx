@@ -40,14 +40,14 @@ export function PublishPanel({
           />
         </div>
         <textarea
-          className="min-h-56 flex-1 resize-none rounded-3xl border border-[#cbd5d1] bg-white px-4 py-4 font-mono text-sm leading-6 outline-none focus:border-[#2e7bd6]"
+          className="min-h-24 flex-1 resize-none rounded-3xl border border-[#cbd5d1] bg-white px-4 py-4 font-mono text-sm leading-6 outline-none focus:border-[#2e7bd6]"
           placeholder={`<h1>My Notes</h1>
 <p>This is a page I wrote for the small web.</p>
 <p>Visit <a href="moon-cafe.zz">Moon Cafe</a> or <a href="missing-room.zz">Missing Room</a>.</p>`}
           value={bodyHtml}
           onChange={(event) => onBodyHtmlChange(event.target.value)}
         />
-        <div className="flex justify-end">
+        <div className="flex shrink-0 justify-end">
           <button
             className="h-11 cursor-pointer rounded-full bg-[#17212b] px-6 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isPublishing}

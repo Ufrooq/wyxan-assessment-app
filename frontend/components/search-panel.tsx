@@ -21,7 +21,7 @@ export function SearchPanel({
   onOpenResult,
 }: SearchPanelProps) {
   return (
-    <section>
+    <section className="shrink-0">
       <h2 className="text-sm font-semibold">Search</h2>
       <form className="mt-3 flex gap-2" onSubmit={onSearch}>
         <input
@@ -37,12 +37,12 @@ export function SearchPanel({
           {isSearching ? "Finding" : "Find"}
         </button>
       </form>
-      <div className="mt-3 space-y-2">
+      <div className="thin-scrollbar mt-3 max-h-44 space-y-2 overflow-y-auto pr-2">
         {results.length > 0 ? (
           results.map((site) => (
             <button
               key={site._id}
-              className="block w-full cursor-pointer rounded-3xl border border-[#e2e8e5] bg-white px-4 py-3 text-left hover:border-[#2e7bd6]"
+              className="block w-full cursor-pointer rounded-xl border border-[#e2e8e5] bg-white px-4 py-3 text-left hover:border-[#2e7bd6]"
               onClick={() => onOpenResult(site.address)}
             >
               <span className="block text-sm font-medium">{site.title}</span>
