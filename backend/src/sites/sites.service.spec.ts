@@ -1,18 +1,35 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { jest } from '@jest/globals';
+import { NotFoundException } from '@nestjs/common';
 import { SitesService } from './sites.service';
 
 describe('SitesService', () => {
   let service: SitesService;
+  let lean: jest.Mock;
+  let findOne: jest.Mock;
+  let siteModel: { findOne: jest.Mock };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [SitesService],
-    }).compile();
+  beforeEach(() => {
+    lean = jest.fn();
+    findOne = jest.fn().mockReturnValue({ lean });
+    siteModel = { findOne };
 
-    service = module.get<SitesService>(SitesService);
+    service = new SitesService(siteModel as never);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('finds a site by lowercase address', async () => {
+    lean.mockResolvedValue({ address: 'moon-cafe.zz' });
+
+    await expect(service.findByAddress('Moon-Cafe.ZZ')).resolves.toEqual({
+      address: 'moon-cafe.zz',
+    });
+    expect(findOne).toHaveBeenCalledWith({ address: 'moon-cafe.zz' });
+  });
+
+  it('throws when a site is missing', async () => {
+    lean.mockResolvedValue(null);
+
+    await expect(service.findByAddress('missing.zz')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 });

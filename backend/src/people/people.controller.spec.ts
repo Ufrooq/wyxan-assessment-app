@@ -1,18 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { jest } from '@jest/globals';
 import { PeopleController } from './people.controller';
+import { PeopleService } from './people.service';
 
 describe('PeopleController', () => {
   let controller: PeopleController;
+  let peopleService: Pick<PeopleService, 'findAll'>;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [PeopleController],
-    }).compile();
+  beforeEach(() => {
+    peopleService = {
+      findAll: jest.fn().mockReturnValue([{ name: 'Amina' }]),
+    };
 
-    controller = module.get<PeopleController>(PeopleController);
+    controller = new PeopleController(peopleService as PeopleService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('returns people from the service', () => {
+    expect(controller.findAll()).toEqual([{ name: 'Amina' }]);
   });
 });

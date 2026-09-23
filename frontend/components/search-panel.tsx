@@ -25,13 +25,13 @@ export function SearchPanel({
       <h2 className="text-sm font-semibold">Search</h2>
       <form className="mt-3 flex gap-2" onSubmit={onSearch}>
         <input
-          className="h-10 min-w-0 flex-1 rounded-md border border-[#cbd5d1] bg-white px-3 text-sm outline-none focus:border-[#2e7bd6]"
+          className="h-10 min-w-0 flex-1 rounded-full border border-[#cbd5d1] bg-white px-4 text-sm outline-none focus:border-[#2e7bd6]"
           placeholder="coffee"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
         />
         <button
-          className="h-10 rounded-md bg-[#17212b] px-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-10 cursor-pointer rounded-full bg-[#17212b] px-5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
           disabled={isSearching}
         >
           {isSearching ? "Finding" : "Find"}
@@ -42,7 +42,7 @@ export function SearchPanel({
           results.map((site) => (
             <button
               key={site._id}
-              className="block w-full rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-left hover:border-[#2e7bd6]"
+              className="block w-full cursor-pointer rounded-3xl border border-[#e2e8e5] bg-white px-4 py-3 text-left hover:border-[#2e7bd6]"
               onClick={() => onOpenResult(site.address)}
             >
               <span className="block text-sm font-medium">{site.title}</span>
@@ -52,11 +52,11 @@ export function SearchPanel({
             </button>
           ))
         ) : hasSearched ? (
-          <p className="rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-sm text-[#667580]">
+          <p className="rounded-full border border-[#e2e8e5] bg-white px-4 py-2 text-sm text-[#667580]">
             No results found.
           </p>
         ) : (
-          <p className="rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-sm text-[#667580]">
+          <p className="rounded-full border border-[#e2e8e5] bg-white px-4 py-2 text-sm text-[#667580]">
             Search page text.
           </p>
         )}

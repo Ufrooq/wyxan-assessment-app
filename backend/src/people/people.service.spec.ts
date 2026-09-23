@@ -1,18 +1,26 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { jest } from '@jest/globals';
 import { PeopleService } from './people.service';
 
 describe('PeopleService', () => {
   let service: PeopleService;
+  let lean: jest.Mock;
+  let sort: jest.Mock;
+  let personModel: { find: jest.Mock };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [PeopleService],
-    }).compile();
+  beforeEach(() => {
+    lean = jest.fn().mockResolvedValue([{ name: 'Amina' }]);
+    sort = jest.fn().mockReturnValue({ lean });
+    personModel = {
+      find: jest.fn().mockReturnValue({ sort }),
+    };
 
-    service = module.get<PeopleService>(PeopleService);
+    service = new PeopleService(personModel as never);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('finds people sorted by name', async () => {
+    await expect(service.findAll()).resolves.toEqual([{ name: 'Amina' }]);
+    expect(personModel.find).toHaveBeenCalledWith();
+    expect(sort).toHaveBeenCalledWith({ name: 1 });
+    expect(lean).toHaveBeenCalledWith();
   });
 });

@@ -27,20 +27,20 @@ export function PublishPanel({
       <form className="mt-3 flex min-h-0 flex-1 flex-col gap-3" onSubmit={onPublish}>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
           <input
-            className="h-11 w-full rounded-md border border-[#cbd5d1] bg-white px-3 font-mono text-sm outline-none focus:border-[#2e7bd6]"
+            className="h-11 w-full rounded-full border border-[#cbd5d1] bg-white px-4 font-mono text-sm outline-none focus:border-[#2e7bd6]"
             placeholder="my-notes.zz"
             value={address}
             onChange={(event) => onAddressChange(event.target.value)}
           />
           <input
-            className="h-11 w-full rounded-md border border-[#cbd5d1] bg-white px-3 text-sm outline-none focus:border-[#2e7bd6]"
+            className="h-11 w-full rounded-full border border-[#cbd5d1] bg-white px-4 text-sm outline-none focus:border-[#2e7bd6]"
             placeholder="My Notes"
             value={title}
             onChange={(event) => onTitleChange(event.target.value)}
           />
         </div>
         <textarea
-          className="min-h-56 flex-1 resize-none rounded-md border border-[#cbd5d1] bg-white px-3 py-3 font-mono text-sm leading-6 outline-none focus:border-[#2e7bd6]"
+          className="min-h-56 flex-1 resize-none rounded-3xl border border-[#cbd5d1] bg-white px-4 py-4 font-mono text-sm leading-6 outline-none focus:border-[#2e7bd6]"
           placeholder={`<h1>My Notes</h1>
 <p>This is a page I wrote for the small web.</p>
 <p>Visit <a href="moon-cafe.zz">Moon Cafe</a> or <a href="missing-room.zz">Missing Room</a>.</p>`}
@@ -49,7 +49,7 @@ export function PublishPanel({
         />
         <div className="flex justify-end">
           <button
-            className="h-11 rounded-md bg-[#17212b] px-5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-11 cursor-pointer rounded-full bg-[#17212b] px-6 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isPublishing}
           >
             {isPublishing ? "Publishing" : "Publish"}

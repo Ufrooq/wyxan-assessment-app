@@ -125,7 +125,7 @@ async function seed() {
                 personModel.findOneAndUpdate(
                     { name },
                     { name },
-                    { upsert: true, new: true },
+                    { upsert: true, returnDocument: 'after' },
                 ),
             ),
         );
@@ -161,7 +161,7 @@ async function seed() {
                         bodyHtml,
                         textContent,
                     },
-                    { upsert: true, new: true },
+                    { upsert: true, returnDocument: 'after' },
                 );
             }),
         );

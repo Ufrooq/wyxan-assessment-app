@@ -16,7 +16,7 @@ export function PersonSelector({
       Person
       <span className="relative">
         <select
-          className="h-11 min-w-32 appearance-none rounded-md border border-[#cbd5d1] bg-white py-0 pl-4 pr-10 text-sm font-medium text-[#17212b] shadow-sm outline-none transition focus:border-[#2e7bd6] focus:ring-2 focus:ring-[#2e7bd6]/15"
+          className="h-11 min-w-32 cursor-pointer appearance-none rounded-full border border-[#cbd5d1] bg-white py-0 pl-5 pr-10 text-sm font-medium text-[#17212b] shadow-sm outline-none transition focus:border-[#2e7bd6] focus:ring-2 focus:ring-[#2e7bd6]/15 disabled:cursor-not-allowed"
           value={selectedPersonId}
           onChange={(event) => onPersonChange(event.target.value)}
           disabled={people.length === 0}

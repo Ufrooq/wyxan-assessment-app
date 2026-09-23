@@ -16,7 +16,7 @@ export function HistoryPanel({ visits, onOpenVisit }: HistoryPanelProps) {
           visits.map((visit) => (
             <button
               key={visit._id}
-              className="block w-full rounded-md border border-[#e5ebe8] bg-white/80 px-3 py-2 text-left hover:border-[#9fc3ee] hover:bg-white"
+              className="block w-full cursor-pointer rounded-xl border border-[#e5ebe8] bg-white/80 px-4 py-3 text-left hover:border-[#9fc3ee] hover:bg-white"
               onClick={() => onOpenVisit(visit.address)}
             >
               <span className="block font-mono text-sm font-normal text-[#17212b]">
@@ -28,7 +28,7 @@ export function HistoryPanel({ visits, onOpenVisit }: HistoryPanelProps) {
             </button>
           ))
         ) : (
-          <p className="rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-sm text-[#667580]">
+          <p className="rounded-full border border-[#e2e8e5] bg-white px-4 py-2 text-sm text-[#667580]">
             No history yet.
           </p>
         )}
