@@ -33,3 +33,21 @@ select,
 textarea {
   font: inherit;
 }
+
+.thin-scrollbar {
+  scrollbar-color: #c8d1cd transparent;
+  scrollbar-width: thin;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #c8d1cd;
+  border-radius: 999px;
+}

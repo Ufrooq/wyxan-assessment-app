@@ -28,6 +28,7 @@ export function BrowserApp({
   const [visits, setVisits] = useState<Visit[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Site[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -82,6 +83,7 @@ export function BrowserApp({
 
   async function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setHasSearched(true);
     setIsSearching(true);
     const results = await searchSites(searchQuery);
     setSearchResults(results);
@@ -152,22 +154,24 @@ export function BrowserApp({
           </div>
 
           <div className="grid min-h-[calc(100vh-190px)] grid-cols-1 lg:grid-cols-[260px_1fr_420px]">
-            <aside className="border-b border-[#e2e8e5] bg-[#fbfcfc] p-4 lg:border-b-0 lg:border-r">
-              <h2 className="text-sm font-semibold">History</h2>
-              <div className="mt-3 space-y-2">
+            <aside className="flex min-h-0 flex-col border-b border-[#e2e8e5] bg-[#fbfcfc] p-4 lg:border-b-0 lg:border-r">
+              <h2 className="text-xs font-medium uppercase tracking-[0.12em] text-[#667580]">
+                History
+              </h2>
+              <div className="thin-scrollbar mt-3 max-h-[calc(100vh-260px)] space-y-2 overflow-y-auto pr-2">
                 {visits.length > 0 ? (
                   visits.map((visit) => (
                     <button
                       key={visit._id}
-                      className="block w-full rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-left hover:border-[#2e7bd6]"
+                      className="block w-full rounded-md border border-[#e5ebe8] bg-white/80 px-3 py-2 text-left hover:border-[#9fc3ee] hover:bg-white"
                       onClick={() =>
                         navigateToAddress(visit.address, "history", null)
                       }
                     >
-                      <span className="block font-mono text-sm">
+                      <span className="block font-mono text-sm font-normal text-[#17212b]">
                         {visit.address}
                       </span>
-                      <span className="mt-1 block text-xs text-[#667580]">
+                      <span className="mt-1 block text-xs text-[#71808b]">
                         {visit.status === "found" ? "Found" : "Not found"}
                       </span>
                     </button>
@@ -248,6 +252,10 @@ export function BrowserApp({
                         </span>
                       </button>
                     ))
+                  ) : hasSearched ? (
+                    <p className="rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-sm text-[#667580]">
+                      No results found.
+                    </p>
                   ) : (
                     <p className="rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-sm text-[#667580]">
                       Search page text.
