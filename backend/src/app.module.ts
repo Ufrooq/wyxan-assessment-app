@@ -5,14 +5,17 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PeopleModule } from './people/people.module';
 import { SitesModule } from './sites/sites.module';
+import { VisitsModule } from './visits/visits.module';
+
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true, envFilePath: '.env'}),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     MongooseModule.forRoot(
       process.env.MONGO_URI ?? 'mongodb://localhost:27017/small-web',
     ),
     PeopleModule,
     SitesModule,
+    VisitsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
