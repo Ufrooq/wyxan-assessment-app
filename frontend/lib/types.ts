@@ -37,3 +37,10 @@ export type Visit = {
   htmlSnapshot: string | null;
   visitedAt: string;
 };
+
+export type CreateSitePayload = {
+  address: string;
+  title: string;
+  bodyHtml: string;
+  authorId: string;
+};

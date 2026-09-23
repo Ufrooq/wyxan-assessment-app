@@ -1,4 +1,10 @@
-import type { PageResult, Site, Visit, VisitSource } from "./types";
+import type {
+  CreateSitePayload,
+  PageResult,
+  Site,
+  Visit,
+  VisitSource,
+} from "./types";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
@@ -112,5 +118,39 @@ export async function searchSites(query: string): Promise<Site[]> {
     return response.json();
   } catch {
     return [];
+  }
+}
+
+export async function publishSite(payload: CreateSitePayload): Promise<{
+  site?: Site;
+  error?: string;
+}> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/sites`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => null);
+      const message = Array.isArray(errorBody?.message)
+        ? errorBody.message[0]
+        : errorBody?.message;
+
+      return {
+        error: message ?? "Could not publish this site.",
+      };
+    }
+
+    return {
+      site: (await response.json()) as Site,
+    };
+  } catch {
+    return {
+      error: "The backend is not reachable right now.",
+    };
   }
 }

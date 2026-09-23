@@ -10,6 +10,7 @@ import { SearchPanel } from "@/components/search-panel";
 import {
   fetchSiteByAddress,
   fetchVisits,
+  publishSite,
   recordVisit,
   searchSites,
 } from "@/lib/client-api";
@@ -47,8 +48,13 @@ export function BrowserApp({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Site[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [publishAddress, setPublishAddress] = useState("");
+  const [publishTitle, setPublishTitle] = useState("");
+  const [publishBodyHtml, setPublishBodyHtml] = useState("");
+  const [publishError, setPublishError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const currentAddress =
     page.status === "found" ? page.site.address : page.address;
@@ -145,6 +151,37 @@ export function BrowserApp({
     setIsSearching(false);
   }
 
+  async function handlePublishSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!selectedPersonId) {
+      setPublishError("Select a person before publishing.");
+      return;
+    }
+
+    setIsPublishing(true);
+    setPublishError(null);
+
+    const result = await publishSite({
+      address: publishAddress.trim().toLowerCase(),
+      title: publishTitle.trim(),
+      bodyHtml: publishBodyHtml,
+      authorId: selectedPersonId,
+    });
+
+    if (result.error || !result.site) {
+      setPublishError(result.error ?? "Could not publish this site.");
+      setIsPublishing(false);
+      return;
+    }
+
+    setPublishAddress("");
+    setPublishTitle("");
+    setPublishBodyHtml("");
+    setIsPublishing(false);
+    await navigateToAddress(result.site.address, "typed", currentAddress);
+  }
+
   return (
     <main className="min-h-screen bg-[#f5f7f7] text-[#17212b]">
       <div className="mx-auto flex min-h-screen w-full max-w-[1560px] flex-col px-6 py-4">
@@ -175,7 +212,7 @@ export function BrowserApp({
             onForward={goForward}
           />
 
-          <div className="grid min-h-[calc(100vh-190px)] grid-cols-1 lg:grid-cols-[260px_1fr_420px]">
+          <div className="grid min-h-[calc(100vh-190px)] grid-cols-1 lg:grid-cols-[290px_1fr_420px]">
             <HistoryPanel
               visits={visits}
               onOpenVisit={(address) =>
@@ -205,7 +242,17 @@ export function BrowserApp({
                 }
               />
 
-              <PublishPanel />
+              <PublishPanel
+                address={publishAddress}
+                title={publishTitle}
+                bodyHtml={publishBodyHtml}
+                error={publishError}
+                isPublishing={isPublishing}
+                onAddressChange={setPublishAddress}
+                onTitleChange={setPublishTitle}
+                onBodyHtmlChange={setPublishBodyHtml}
+                onPublish={handlePublishSubmit}
+              />
             </aside>
           </div>
         </section>
