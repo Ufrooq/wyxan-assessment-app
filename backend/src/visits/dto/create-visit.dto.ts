@@ -14,8 +14,8 @@ export class CreateVisitDto {
     @IsEnum(['found', 'not_found'])
     status: 'found' | 'not_found';
 
-    @IsEnum(['typed', 'link', 'history'])
-    arrivedFrom: 'typed' | 'link' | 'history';
+  @IsEnum(['typed', 'link', 'history', 'search'])
+  arrivedFrom: 'typed' | 'link' | 'history' | 'search';
 
     @IsOptional()
     @IsString()

@@ -17,8 +17,8 @@ export class Visit {
     @Prop({ required: true, enum: ['found', 'not_found'] })
     status: 'found' | 'not_found';
 
-    @Prop({ required: true, enum: ['typed', 'link', 'history'] })
-    arrivedFrom: 'typed' | 'link' | 'history';
+    @Prop({ required: true, enum: ['typed', 'link', 'history', 'search'] })
+    arrivedFrom: 'typed' | 'link' | 'history' | 'search';
 
     @Prop({ type: String, default: null })
     referrerAddress: string | null;

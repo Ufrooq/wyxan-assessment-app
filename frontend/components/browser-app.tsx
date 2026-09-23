@@ -1,64 +1,19 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import type { PageResult, Person, Site } from "@/lib/types";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
-
-const historyItems = [
-  "tidepool.zz",
-  "moon-cafe.zz",
-  "archive-house.zz",
-  "lost-pier.zz",
-];
-
-const searchResults = [
-  "moon-cafe.zz",
-  "paper-orbit.zz",
-  "weather-attic.zz",
-];
+import { FormEvent, useEffect, useState } from "react";
+import {
+  fetchSiteByAddress,
+  fetchVisits,
+  recordVisit,
+  searchSites,
+} from "@/lib/client-api";
+import type { PageResult, Person, Site, Visit, VisitSource } from "@/lib/types";
 
 type BrowserAppProps = {
   people: Person[];
   initialAddress: string;
   initialPage: PageResult;
 };
-
-async function fetchSite(address: string): Promise<PageResult> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/sites/${address}`);
-
-    if (response.status === 404) {
-      return {
-        status: "not_found",
-        address,
-        message: "This address does not exist.",
-      };
-    }
-
-    if (!response.ok) {
-      return {
-        status: "not_found",
-        address,
-        message: "The backend could not load this address.",
-      };
-    }
-
-    const site = (await response.json()) as Site;
-
-    return {
-      status: "found",
-      site,
-    };
-  } catch {
-    return {
-      status: "not_found",
-      address,
-      message: "The backend is not reachable right now.",
-    };
-  }
-}
 
 export function BrowserApp({
   people,
@@ -67,27 +22,70 @@ export function BrowserApp({
 }: BrowserAppProps) {
   const [addressInput, setAddressInput] = useState(initialAddress);
   const [page, setPage] = useState<PageResult>(initialPage);
+  const [selectedPersonId, setSelectedPersonId] = useState(
+    people[0]?._id ?? "",
+  );
+  const [visits, setVisits] = useState<Visit[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Site[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   const currentAddress =
     page.status === "found" ? page.site.address : page.address;
   const currentTitle =
     page.status === "found" ? page.site.title : "Address not found";
 
-  async function handleAddressSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  useEffect(() => {
+    async function loadVisits() {
+      const nextVisits = await fetchVisits(selectedPersonId);
+      setVisits(nextVisits);
+    }
 
-    const nextAddress = addressInput.trim().toLowerCase();
+    loadVisits();
+  }, [selectedPersonId]);
+
+  async function navigateToAddress(
+    address: string,
+    arrivedFrom: VisitSource,
+    referrerAddress: string | null,
+  ) {
+    const nextAddress = address.trim().toLowerCase();
 
     if (!nextAddress) {
       return;
     }
 
     setIsLoading(true);
-    const nextPage = await fetchSite(nextAddress);
+    const nextPage = await fetchSiteByAddress(nextAddress);
     setPage(nextPage);
     setAddressInput(nextAddress);
+
+    if (selectedPersonId) {
+      await recordVisit({
+        personId: selectedPersonId,
+        page: nextPage,
+        arrivedFrom,
+        referrerAddress,
+      });
+      const nextVisits = await fetchVisits(selectedPersonId);
+      setVisits(nextVisits);
+    }
+
     setIsLoading(false);
+  }
+
+  async function handleAddressSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await navigateToAddress(addressInput, "typed", currentAddress);
+  }
+
+  async function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSearching(true);
+    const results = await searchSites(searchQuery);
+    setSearchResults(results);
+    setIsSearching(false);
   }
 
   return (
@@ -106,6 +104,8 @@ export function BrowserApp({
             <span className="relative">
               <select
                 className="h-11 min-w-32 appearance-none rounded-md border border-[#cbd5d1] bg-white py-0 pl-4 pr-10 text-sm font-medium text-[#17212b] shadow-sm outline-none transition focus:border-[#2e7bd6] focus:ring-2 focus:ring-[#2e7bd6]/15"
+                value={selectedPersonId}
+                onChange={(event) => setSelectedPersonId(event.target.value)}
                 disabled={people.length === 0}
               >
                 {people.length > 0 ? (
@@ -155,14 +155,28 @@ export function BrowserApp({
             <aside className="border-b border-[#e2e8e5] bg-[#fbfcfc] p-4 lg:border-b-0 lg:border-r">
               <h2 className="text-sm font-semibold">History</h2>
               <div className="mt-3 space-y-2">
-                {historyItems.map((item) => (
-                  <button
-                    key={item}
-                    className="block w-full rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-left font-mono text-sm hover:border-[#2e7bd6]"
-                  >
-                    {item}
-                  </button>
-                ))}
+                {visits.length > 0 ? (
+                  visits.map((visit) => (
+                    <button
+                      key={visit._id}
+                      className="block w-full rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-left hover:border-[#2e7bd6]"
+                      onClick={() =>
+                        navigateToAddress(visit.address, "history", null)
+                      }
+                    >
+                      <span className="block font-mono text-sm">
+                        {visit.address}
+                      </span>
+                      <span className="mt-1 block text-xs text-[#667580]">
+                        {visit.status === "found" ? "Found" : "Not found"}
+                      </span>
+                    </button>
+                  ))
+                ) : (
+                  <p className="rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-sm text-[#667580]">
+                    No history yet.
+                  </p>
+                )}
               </div>
             </aside>
 
@@ -180,14 +194,20 @@ export function BrowserApp({
                 />
               ) : (
                 <article className="flex flex-1 items-center justify-center px-5 py-6 text-center">
-                  <div>
-                    <p className="font-mono text-sm text-[#667580]">
+                  <div className="w-full max-w-md rounded-lg border border-[#e2e8e5] bg-[#fbfcfc] px-6 py-8">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-[#f0c4bf] bg-[#fae8e7] font-mono text-xl font-semibold text-[#c4453d]">
+                      404
+                    </div>
+                    <p className="mt-5 font-mono text-sm text-[#667580]">
                       {page.address}
                     </p>
                     <h1 className="mt-2 text-3xl font-semibold">
                       Address not found
                     </h1>
                     <p className="mt-3 text-[#43515d]">{page.message}</p>
+                    <p className="mt-5 text-sm text-[#667580]">
+                      Check the address or try another .zz site.
+                    </p>
                   </div>
                 </article>
               )}
@@ -196,24 +216,43 @@ export function BrowserApp({
             <aside className="border-t border-[#e2e8e5] bg-[#fbfcfc] p-4 lg:border-l lg:border-t-0">
               <section>
                 <h2 className="text-sm font-semibold">Search</h2>
-                <form className="mt-3 flex gap-2">
+                <form className="mt-3 flex gap-2" onSubmit={handleSearchSubmit}>
                   <input
                     className="h-10 min-w-0 flex-1 rounded-md border border-[#cbd5d1] bg-white px-3 text-sm outline-none focus:border-[#2e7bd6]"
                     placeholder="coffee"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
                   />
-                  <button className="h-10 rounded-md bg-[#17212b] px-3 text-sm font-medium text-white">
-                    Find
+                  <button
+                    className="h-10 rounded-md bg-[#17212b] px-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={isSearching}
+                  >
+                    {isSearching ? "Finding" : "Find"}
                   </button>
                 </form>
                 <div className="mt-3 space-y-2">
-                  {searchResults.map((item) => (
-                    <button
-                      key={item}
-                      className="block w-full rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-left font-mono text-sm hover:border-[#2e7bd6]"
-                    >
-                      {item}
-                    </button>
-                  ))}
+                  {searchResults.length > 0 ? (
+                    searchResults.map((site) => (
+                      <button
+                        key={site._id}
+                        className="block w-full rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-left hover:border-[#2e7bd6]"
+                        onClick={() =>
+                          navigateToAddress(site.address, "search", currentAddress)
+                        }
+                      >
+                        <span className="block text-sm font-medium">
+                          {site.title}
+                        </span>
+                        <span className="mt-1 block font-mono text-xs text-[#667580]">
+                          {site.address}
+                        </span>
+                      </button>
+                    ))
+                  ) : (
+                    <p className="rounded-md border border-[#e2e8e5] bg-white px-3 py-2 text-sm text-[#667580]">
+                      Search page text.
+                    </p>
+                  )}
                 </div>
               </section>
 

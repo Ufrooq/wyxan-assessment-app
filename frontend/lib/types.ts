@@ -22,3 +22,18 @@ export type PageResult =
       address: string;
       message: string;
     };
+
+export type VisitSource = "typed" | "link" | "history" | "search";
+
+export type Visit = {
+  _id: string;
+  personId: string;
+  address: string;
+  siteId: string | null;
+  status: "found" | "not_found";
+  arrivedFrom: VisitSource;
+  referrerAddress: string | null;
+  titleSnapshot: string | null;
+  htmlSnapshot: string | null;
+  visitedAt: string;
+};
