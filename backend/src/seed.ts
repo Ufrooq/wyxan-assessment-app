@@ -116,6 +116,10 @@ async function seed() {
         const siteModel = app.get<Model<Site>>(getModelToken(Site.name));
         const visitModel = app.get<Model<Visit>>(getModelToken(Visit.name));
 
+        try {
+            await siteModel.collection.dropIndex('name_1');
+        } catch {}
+
         const savedPeople = await Promise.all(
             people.map((name) =>
                 personModel.findOneAndUpdate(

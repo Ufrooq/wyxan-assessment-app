@@ -20,13 +20,13 @@ export class Visit {
     @Prop({ required: true, enum: ['typed', 'link', 'history'] })
     arrivedFrom: 'typed' | 'link' | 'history';
 
-    @Prop({ default: null })
+    @Prop({ type: String, default: null })
     referrerAddress: string | null;
 
-    @Prop({ default: null })
+    @Prop({ type: String, default: null })
     titleSnapshot: string | null;
 
-    @Prop({ default: null })
+    @Prop({ type: String, default: null })
     htmlSnapshot: string | null;
 
     @Prop({ default: Date.now })
