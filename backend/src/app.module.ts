@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PeopleModule } from './people/people.module';
+import { SitesModule } from './sites/sites.module';
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true, envFilePath: '.env'}),
@@ -11,6 +12,7 @@ import { PeopleModule } from './people/people.module';
       process.env.MONGO_URI ?? 'mongodb://localhost:27017/small-web',
     ),
     PeopleModule,
+    SitesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
